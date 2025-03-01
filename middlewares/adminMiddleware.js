@@ -17,7 +17,7 @@ async function adminMiddleware (req, res, next) {
             })
         }
         else{
-            req.userId = compareToken.adminId;
+            req.adminId = compareToken.adminId;
             next()
         }
     } catch (error) {

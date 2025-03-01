@@ -20,7 +20,7 @@ adminRouter.post("/signup", async (req, res) => {
             message: "wrong input type"
         })
     }
-    const existing = await adminModel.exists({ email })
+    const existing = await adminModel.exists({ email:req.body.email  })
     if (existing) {
         res.status(405).json({
             "message": "admin already exists"
@@ -63,6 +63,7 @@ adminRouter.post("/signin", async (req, res) => {
         const password = req.body.password
         const admin = await adminModel.findOne({
             email: email
+            
         })
         if (!admin) {
             return res.status(400).json({
@@ -134,10 +135,15 @@ adminRouter.put("/course", async (req, res) => {
     }
     try {
         const adminId = req.adminId
+        console.log(adminId)
+        const courseId =req.headers["courseid"]; // or req.headers["course-id"]
+
+        console.log(courseId)
         const { title, description, imageUrl, price } = req.body
 
         const course = await courseModel.findOneAndUpdate({
-            creatorId: adminId
+            creatorId: adminId,
+            _id:courseId
         }, {
             title: title,
             description: description,

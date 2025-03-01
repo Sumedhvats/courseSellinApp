@@ -1,9 +1,10 @@
 const { Router } = require("express")
 const userRouter = Router()
-const {userModel}=require("../db")
+const {userModel,purchaseModel,courseModel}=require("../db")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const { z, string } = require("zod")
+const userMiddleware = require("../middlewares/userMiddleware")
 const JWT_USER_TOKEN = process.env.JWT_USER_TOKEN
 userRouter.post("/signup", async (req, res) => {
     const bodySchema = z.object({
@@ -18,7 +19,7 @@ userRouter.post("/signup", async (req, res) => {
             message: "wrong input type"
         })
     }
-    const existing = await userModel.exists({ email })
+    const existing = await userModel.exists({ email:req.body.email })
     if (existing) {
         res.status(405).json({
             "message": "user already exists"
@@ -83,7 +84,7 @@ userRouter.post("/signin", async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 })
-userRouter.get("/myCourses", async (req, res) => {
+userRouter.post("/myCourses",userMiddleware,async (req,res)=>{
     try {
         const userId = req.userId
         const courses = await courseModel.find({
@@ -104,8 +105,8 @@ userRouter.get("/myCourses", async (req, res) => {
         console.error(e);
         res.status(500).json({ message: "Internal server error" });
     }
-
 })
+
 module.exports = {
     userRouter: userRouter
 }
