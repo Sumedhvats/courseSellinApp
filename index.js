@@ -1,0 +1,15 @@
+const express = require("express")
+const app = express()
+app.use(express.json())
+const mongoose = require("mongoose")
+const jwt = require("jsonwebtoken")
+const {coursesRouter} = require("./routes/courses.js")
+const {userRouter} = require("./routes/user.js")
+const {adminRouter} = require("./routes/admin.js")
+
+
+app.use("/api/v1/courses", coursesRouter)
+app.use("/api/v1/user", userRouter)
+app.use("/api/v1/admin", adminRouter)
+mongoose.connect(process.env.MONGO_DB_URL)
+app.listen(process.env.PORT) 
