@@ -18,6 +18,12 @@ userRouter.post("/signup", async (req, res) => {
             message: "wrong input type"
         })
     }
+    const existing = await userModel.exists({ email })
+    if (existing) {
+        res.status(405).json({
+            "message": "user already exists"
+        })
+    }
     try {
         const email = req.body.email
         const password = req.body.password
@@ -34,7 +40,8 @@ userRouter.post("/signup", async (req, res) => {
             message: "successfully signed up"
         })
     } catch (e) {
-        console.log(e);
+        console.error(e);
+        res.status(500).json({ message: "Internal server error" });
     }
 
 })
@@ -72,11 +79,32 @@ userRouter.post("/signin", async (req, res) => {
         
         
     } catch (e) {
-        console.log(e);
+        console.error(e);
+        res.status(500).json({ message: "Internal server error" });
     }
-    
 })
 userRouter.get("/myCourses", async (req, res) => {
+    try {
+        const userId = req.userId
+        const courses = await courseModel.find({
+            creatorId: userId
+        })
+        if (!courses.length) {
+            return res.status(404).json({ message: "No courses found for this user." });
+        }
+        coursesOfuser = []
+        courses.forEach(course => {
+            coursesOfuser.push(course.title)
+        })
+        res.status(200).json({
+            message: "course found",
+            courses: coursesOfuser
+        })
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ message: "Internal server error" });
+    }
+
 })
 module.exports = {
     userRouter: userRouter
